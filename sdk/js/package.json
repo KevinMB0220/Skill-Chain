@@ -1,0 +1,31 @@
+{
+  "name": "@skillchain/sdk",
+  "version": "0.1.0",
+  "description": "TypeScript SDK for SkillChain protocol integration",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run clean && npm run build"
+  },
+  "keywords": [
+    "skillchain",
+    "polkadot",
+    "web3",
+    "reputation",
+    "blockchain"
+  ],
+  "author": "SkillChain Team",
+  "license": "MIT",
+  "dependencies": {
+    "@polkadot/api": "^10.11.2",
+    "@polkadot/api-contract": "^10.11.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.5",
+    "typescript": "^5.3.3"
+  }
+}
+
