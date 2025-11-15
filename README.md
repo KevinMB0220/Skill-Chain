@@ -107,6 +107,13 @@ TypeScript SDK for external integrations with functions:
 - `addClaim()`
 - `approveClaim()`
 - `getClaimsByAddress()`
+- `linkDid()` - Link KILT DID to profile
+- `getDid()` - Get linked DID from profile
+
+**KILT Integration:**
+- `KiltClient` - Create Light DIDs, verify credentials
+- `createLightDid()` - Generate KILT Light DID
+- `verifyCredential()` - Verify KILT credentials
 
 ## 🛠️ Tech Stack
 
@@ -114,6 +121,7 @@ TypeScript SDK for external integrations with functions:
 - **Frontend:** Next.js 14, TypeScript, TailwindCSS
 - **Blockchain:** Polkadot, @polkadot/api
 - **Wallets:** Polkadot.js Extension, Talisman, SubWallet
+- **Identity:** KILT Protocol (DIDs and Verifiable Credentials)
 
 ## 🎯 Hackathon
 
