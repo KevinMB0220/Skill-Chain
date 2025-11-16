@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import { Layout } from '@/components/Layout';
 import { useWallet } from '@/hooks/usePolkadot';
 import { useKiltProfile } from '@/hooks/use-kilt-profile';
 import { ProfileCard } from '@/components/my-profile/profile-card';
@@ -24,7 +23,6 @@ export default function ProfilePage() {
   }, [connect]);
 
   return (
-    <Layout title="My Profile" description="Manage your KILT identity and on-chain profile">
       <div className="container mx-auto px-4 py-10 space-y-8">
         {!walletConnected && (
           <div className="max-w-2xl mx-auto">
@@ -124,7 +122,6 @@ export default function ProfilePage() {
           </div>
         </div>
       </div>
-    </Layout>
   );
 }
 
