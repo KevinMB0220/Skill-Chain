@@ -1,22 +1,21 @@
-import { Layout } from '@/components/Layout';
 import { useWallet } from '@/hooks/usePolkadot';
 import { useContract } from '@/hooks/useContract';
 import { useTotalClaims } from '@/hooks/useTotalClaims';
+import { useRecentClaims } from '@/hooks/use-recent-claims';
 import { Button } from '@/components/Button';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { ErrorAlert } from '@/components/ErrorAlert';
+import { RecentClaims } from '@/components/claims/recent-claims';
 import Link from 'next/link';
 
 export default function Home() {
   const { isConnected, selectedAccount } = useWallet();
   const { isReady, error: contractError } = useContract();
   const { totalClaims, isLoading: isLoadingClaims, error: claimsError } = useTotalClaims();
+  const { claims: recentClaims, isLoading: isLoadingRecent } = useRecentClaims();
 
   return (
-    <Layout
-      title="Home"
-      description="Decentralized professional reputation protocol built on Polkadot"
-    >
+    <>
       <div className="container mx-auto px-4 py-16">
         {/* Hero Section */}
         <div className="text-center mb-16">
@@ -77,6 +76,11 @@ export default function Home() {
           </div>
         )}
 
+        {/* Recent Claims */}
+        <div className="max-w-3xl mx-auto mb-16">
+          <RecentClaims claims={recentClaims} loading={isLoadingRecent} />
+        </div>
+
         {/* Features Section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto mb-16">
           <div className="bg-white rounded-lg shadow-md p-6">
@@ -126,12 +130,15 @@ export default function Home() {
                 <Link href="/claims/new">
                   <Button variant="secondary" size="lg">Create Claim</Button>
                 </Link>
+                <Link href="/claims/pending">
+                  <Button variant="outline" size="lg">Pending Claims</Button>
+                </Link>
               </div>
             </div>
           )}
         </div>
       </div>
-    </Layout>
+    </>
   );
 }
 
