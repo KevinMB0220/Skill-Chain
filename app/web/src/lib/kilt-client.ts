@@ -169,13 +169,13 @@ export class KiltClient {
     }
   }
 
-  async resolveDid(did: string): Promise<Kilt.Did.FullDidDetails | null> {
+  async resolveDid(did: string): Promise<any> {
     await this.ensureConnected();
 
     try {
       const resolutionResult = await Kilt.Did.resolve(did as Kilt.DidUri);
       if (resolutionResult && resolutionResult.document) {
-        return resolutionResult.details || null;
+        return resolutionResult;
       }
       return null;
     } catch (error) {
