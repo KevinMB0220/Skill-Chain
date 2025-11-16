@@ -124,6 +124,48 @@ export function useKiltProfile(): KiltHookReturn {
     }
   }, [connect, getClient, state.identity.did, state.isConnected]);
 
+  const linkDidToProfile = useCallback(
+    async (skillchainClient: { linkDid: (did: string, signerAddress?: string) => Promise<{ success: boolean; error?: string }> }, signerAddress?: string) => {
+      try {
+        setState(prev => ({ ...prev, actionError: null }));
+        if (!state.identity.did) throw new Error('No DID to link');
+        if (!state.isConnected) await connect();
+        const res = await getClient().linkDidToProfile(state.identity.did, skillchainClient, signerAddress || '');
+        if (!res?.success) {
+          throw new Error(res?.error || 'Failed to link DID');
+        }
+      } catch (e: any) {
+        setState(prev => ({ ...prev, actionError: e?.message || 'Failed to link DID' }));
+      }
+    },
+    [connect, getClient, state.identity.did, state.isConnected]
+  );
+
+  const getDidFromAccount = useCallback(
+    async (accountId: string, skillchainClient: { getDid: (accountId: string) => Promise<string | null> }): Promise<string | null> => {
+      try {
+        const did = await getClient().getDidFromAccount(accountId, skillchainClient);
+        return did;
+      } catch {
+        return null;
+      }
+    },
+    [getClient]
+  );
+
+  const verifyCredential = useCallback(
+    async (credential: unknown) => {
+      try {
+        if (!state.isConnected) await connect();
+        const result = await getClient().verifyCredential(credential);
+        return result;
+      } catch (e: any) {
+        return { valid: false, revoked: false, error: e?.message || 'Verification failed' };
+      }
+    },
+    [connect, getClient, state.isConnected]
+  );
+
   return useMemo(
     () => ({
       state,
@@ -131,8 +173,11 @@ export function useKiltProfile(): KiltHookReturn {
       disconnect,
       createLightDid,
       resolveCurrentDid,
+      linkDidToProfile,
+      getDidFromAccount,
+      verifyCredential,
     }),
-    [connect, createLightDid, disconnect, resolveCurrentDid, state]
+    [connect, createLightDid, disconnect, resolveCurrentDid, linkDidToProfile, getDidFromAccount, verifyCredential, state]
   );
 }
 

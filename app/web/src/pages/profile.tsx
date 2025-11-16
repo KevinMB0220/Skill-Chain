@@ -4,12 +4,19 @@ import { useWallet } from '@/hooks/usePolkadot';
 import { useKiltProfile } from '@/hooks/use-kilt-profile';
 import { ProfileCard } from '@/components/my-profile/profile-card';
 import { ProfileSetup } from '@/components/my-profile/profile-setup';
+import { LinkedDidCard } from '@/components/my-profile/linked-did-card';
+import { CredentialVerifier } from '@/components/my-profile/credential-verifier';
 import { ErrorAlert } from '@/components/ErrorAlert';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
+import { useSkillchainProfile } from '@/hooks/use-skillchain-profile';
 
 export default function ProfilePage() {
   const { isConnected: walletConnected, connect: connectWallet, selectedAccount } = useWallet();
-  const { state, connect, createLightDid, resolveCurrentDid } = useKiltProfile();
+  const { state, connect, createLightDid, resolveCurrentDid, linkDidToProfile, getDidFromAccount, verifyCredential } = useKiltProfile();
+  const skillchain = useSkillchainProfile();
+  const [isRefreshingLinked, setIsRefreshingLinked] = React.useState(false);
+  const [linkedDid, setLinkedDid] = React.useState<string | null>(null);
+  const [linkError, setLinkError] = React.useState<string | null>(null);
 
   useEffect(() => {
     // Auto-connect KILT network when entering the page to match test expectations
@@ -46,6 +53,57 @@ export default function ProfilePage() {
             resolvedUri={state.lastResolvedUri || null}
             onCreateDid={() => createLightDid()}
             onResolve={resolveCurrentDid}
+          />
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-5xl mx-auto">
+          <LinkedDidCard
+            onChainDid={linkedDid}
+            isReady={skillchain.isReady}
+            error={skillchain.contractError || null}
+            isRefreshing={isRefreshingLinked}
+            onRefresh={async () => {
+              if (!selectedAccount?.address) return;
+              setIsRefreshingLinked(true);
+              try {
+                const did = await getDidFromAccount(selectedAccount.address, { getDid: skillchain.getDid });
+                setLinkedDid(did);
+              } finally {
+                setIsRefreshingLinked(false);
+              }
+            }}
+            onLink={
+              state.identity.did
+                ? async () => {
+                    setLinkError(null);
+                    try {
+                      await linkDidToProfile({ linkDid: skillchain.linkDid }, selectedAccount?.address);
+                      // refresh after link
+                      if (selectedAccount?.address) {
+                        const did = await getDidFromAccount(selectedAccount.address, { getDid: skillchain.getDid });
+                        setLinkedDid(did);
+                      }
+                    } catch (e: any) {
+                      setLinkError(e?.message || 'Failed to link DID');
+                    }
+                  }
+                : undefined
+            }
+            canLink={!!state.identity.did && !!walletConnected}
+          />
+          {linkError && <ErrorAlert message={linkError} />}
+        </div>
+
+        <div className="max-w-5xl mx-auto">
+          <CredentialVerifier
+            onVerify={async (json) => {
+              try {
+                const parsed = JSON.parse(json);
+                return await verifyCredential(parsed);
+              } catch (e: any) {
+                return { valid: false, revoked: false, error: e?.message || 'Invalid JSON' };
+              }
+            }}
           />
         </div>
 
