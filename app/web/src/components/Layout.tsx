@@ -22,7 +22,7 @@ export function Layout({ children, title = 'SkillChain', description }: LayoutPr
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
-        <Header />S
+        <Header />
         <main>{children}</main>
       </div>
     </>
