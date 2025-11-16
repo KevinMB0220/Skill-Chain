@@ -7,10 +7,13 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { AddressSearch } from '@/components/explore/address-search';
 import { ClaimList } from '@/components/claims/recent-claims'; // placeholder not used; keep page minimal
+import { useExploreProfileMock } from '@/hooks/use-explore-profile-mock';
+import { ProfileSummary } from '@/components/explore/profile-summary';
 
 export default function Explore() {
   const router = useRouter();
   const [searchAddress, setSearchAddress] = useState<string | null>(null);
+  const { isLoading, error, profile } = useExploreProfileMock(searchAddress);
 
   useEffect(() => {
     const a = (router.query.address as string) || null;
@@ -43,7 +46,7 @@ export default function Explore() {
             {/* Search form */}
             <AddressSearch
               onSearch={handleSearch}
-              loading={false}
+              loading={isLoading}
               initialAddress={searchAddress || ''}
             />
 
@@ -53,6 +56,28 @@ export default function Explore() {
                 <p className="text-gray-600">
                   Enter a Polkadot address above to search for profiles and claims.
                 </p>
+              </div>
+            )}
+
+            {/* Search results (mock) */}
+            {searchAddress && (
+              <div className="w-full space-y-4">
+                {isLoading && (
+                  <div className="bg-white rounded-lg shadow-md p-6 text-center">
+                    <p className="text-gray-600">Searching profile...</p>
+                  </div>
+                )}
+                {!isLoading && !profile && !error && (
+                  <div className="bg-white rounded-lg shadow-md p-6 text-center">
+                    <p className="text-gray-600">No profile found for this address.</p>
+                  </div>
+                )}
+                {!isLoading && error && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-800 text-sm text-left">
+                    {error}
+                  </div>
+                )}
+                {!isLoading && profile && <ProfileSummary profile={profile} />}
               </div>
             )}
           </div>
