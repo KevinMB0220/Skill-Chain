@@ -95,7 +95,18 @@ cargo contract build --release
 - Size: 12.9KB (optimized)
 - Artifacts: `target/ink/skillchain.contract`
 
-4. **Deploy the contract:**
+4. **Local one-liner (node + deploy both contracts)**
+
+```bash
+bash contracts/deploy-local-all.sh
+```
+
+This will:
+- Restart a local contracts node (`ws://127.0.0.1:9944`)
+- Build and deploy SkillChain and Escrow
+- Print .env-ready lines with both addresses
+
+5. **Deploy the contract (manual alternative):**
 
 ```bash
 # Local node
@@ -105,7 +116,7 @@ cargo contract build --release
 ./deploy.sh paseo "your seed phrase"
 ```
 
-See [DEPLOYMENT.md](contracts/skillchain/DEPLOYMENT.md) for detailed instructions.
+For a concise local guide, see `contracts/skillchain/deployment-local.md`. For quick steps, see `contracts/how-deploy.md`.
 
 5. **Run the frontend:**
 
